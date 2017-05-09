@@ -1,0 +1,3 @@
+Sim: 0/20 Seed: 121 --- Time: 1.66 seconds 
+Sim: 0/220 Seed: 120 --- Time: 53.124 seconds 
+Sim: 0/220 Seed: 121 --- Time: 53.392 seconds 

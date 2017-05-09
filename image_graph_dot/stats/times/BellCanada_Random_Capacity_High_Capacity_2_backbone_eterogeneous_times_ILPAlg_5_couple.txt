@@ -1,0 +1,10 @@
+Sim: 0/20 Seed: 120 --- Time: 1.829 seconds 
+Sim: 0/40 Seed: 120 --- Time: 1.817 seconds 
+Sim: 0/60 Seed: 120 --- Time: 1.539 seconds 
+Sim: 0/80 Seed: 120 --- Time: 1.833 seconds 
+Sim: 0/100 Seed: 120 --- Time: 1.777 seconds 
+Sim: 0/120 Seed: 120 --- Time: 1.552 seconds 
+Sim: 0/140 Seed: 120 --- Time: 1.678 seconds 
+Sim: 0/160 Seed: 120 --- Time: 1.708 seconds 
+Sim: 0/180 Seed: 120 --- Time: 1.431 seconds 
+Sim: 0/200 Seed: 120 --- Time: 1.446 seconds 

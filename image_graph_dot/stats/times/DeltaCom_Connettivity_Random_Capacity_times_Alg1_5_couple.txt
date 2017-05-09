@@ -1,0 +1,12 @@
+Sim: 0/5 Seed: 120 --- Time: 1.008 seconds 
+Sim: 0/5 Seed: 121 --- Time: 2.029 seconds 
+Sim: 0/5 Seed: 122 --- Time: 1.68 seconds 
+Sim: 0/5 Seed: 123 --- Time: 1.51 seconds 
+Sim: 0/5 Seed: 124 --- Time: 2.328 seconds 
+Sim: 0/5 Seed: 125 --- Time: 1.639 seconds 
+Sim: 0/5 Seed: 126 --- Time: 1.935 seconds 
+Sim: 0/5 Seed: 127 --- Time: 1.579 seconds 
+Sim: 0/5 Seed: 128 --- Time: 2.023 seconds 
+Sim: 0/5 Seed: 129 --- Time: 1.22 seconds 
+Sim: 0/10 Seed: 120 --- Time: 1.809 seconds 
+Sim: 0/10 Seed: 121 --- Time: 1.43 seconds 
