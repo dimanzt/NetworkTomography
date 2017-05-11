@@ -960,7 +960,7 @@ Best_Cost =0
 #for L in range(2, 5):
 ####Start Enumerating the minimal solutions:
 start_time = time.time()
-for L in range(2,6):
+for L in range(2,3): #(2,6):
 #for L in range(len(stuff), len(stuff)+1):
   #L = x
   for subset in itertools.combinations(stuff, L):
