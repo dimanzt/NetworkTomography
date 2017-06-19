@@ -156,14 +156,14 @@ def optimal_SDN(H,green_edges, K):
     my_theta=[]
 
     #Deltah, Thetah, Used_Edges
-    my_altered_switches,my_used_arc, my_delta, my_theta =optimize_SDN(nodes,demand_flows,arcs,capacity,K,inflow, demand_value)
+    my_altered_switches,my_used_arc, my_delta, my_theta =optimize_SDN(H,nodes,demand_flows,arcs,capacity,K,inflow, demand_value)
 
     print 'Rerouted flows'
-    print Deltah
+    print my_delta #Deltah
     print 'Delayed flows'
-    print Thetah
+    print my_theta #Thetah
     print 'Used Edges'
-    print Used_Edges
+    print  my_used_arc#Used_Edges
     """
     for node in nodes_used:
         if H.node[node]['status']=='destroyed':
@@ -175,26 +175,34 @@ def optimal_SDN(H,green_edges, K):
         keydict=H[id_source][id_target]
         for k in keydict:
             if H[id_source][id_target][k]['type']=='normal':# and H[id_source][id_target][k]['type']!='green':
-                if edge in Used_Edges:# H[id_source][id_target][k]['status']=='':#'destroyed':
+                if edge in my_used_arc: #Used_Edges:# H[id_source][id_target][k]['status']=='':#'destroyed':
                     #edges_repaired.append(edge)
                     H[id_source][id_target][k]['status'] = 'used'
-                elif edge not in Used_Edges:
-                    H[id_source][id_target][k]'status'] = 'on'
+                elif edge not in my_used_arc: #Used_Edges:
+                    H[id_source][id_target][k]['status'] = 'on'
     #We give higher priority to the first type of disruption which is the flow re-routes
     w_low = 1
     w_high = 2
     Objective = 0
-    for i in Deltah:
-      Objective = w_high*i + Objective
-    for i in Thetah:
-      Objective = w_low*i + Objective
-    return Objective, Deltah, Thetah, H
+    #for i in range(0,len(my_delta)): #Deltah:
+    for i in demand_flows:
+      print 'Delta:'
+      print my_delta[i]
+      Objective = w_high*float(my_delta[i]) + Objective
+    #for i in range(0, len(my_theta)): #Thetah:
+    for i in demand_flows:
+      print 'Theta:'
+      print my_theta[i]
+      Objective = w_low*float(my_theta[i]) + Objective
+    return Objective, my_delta, my_theta, H, my_used_arc #Deltah, Thetah, H
 
 
 
-def optimize_SDN(nodes,demand_flows,arcs,capacity,K,inflow, demand_value):
+def optimize_SDN(H,nodes,demand_flows,arcs,capacity,K,inflow, demand_value):
 
     dmax=100
+    print 'USED EDGES:'
+    print K
     # Create optimization model
     m = Model('SDN_Disruption')
     # Create variables
@@ -218,6 +226,7 @@ def optimize_SDN(nodes,demand_flows,arcs,capacity,K,inflow, demand_value):
         Thetah[h] = m.addVar(ub=1, obj=1.0, vtype=GRB.BINARY, name='Thetah_%s' % (h))
     m.update()
     #Add and auxiulary variable to indicate altered switches:
+    t = {}
     for i in nodes:
         t[i]= m.addVar(ub=1, obj=0.0, vtype=GRB.BINARY, name='T_%s' % (i))
     m.update()
@@ -276,25 +285,28 @@ def optimize_SDN(nodes,demand_flows,arcs,capacity,K,inflow, demand_value):
     m.update()
     #Add Constraint to ensure one disruption is counted at a time
     for h in demand_flows:
-        m.addConstr(Deltah[h]+ Thetah[h] <2 , 'OneDisruption_%s' % (h))
+        m.addConstr((Deltah[h]+ Thetah[h]) <= 1, 'OneDisruption_%s' % (h))
     m.update()
     #Add Constraint to ensure \delta is 1 only when there is a re-routing of the exisiting flows:
-    
     for h in demand_flows:
-        m.addConstr((quicksum(x[i,j,h]+K[i,j,h]-2*x[i,j,h]*K[i,j,h] for h in demand_flows))/len(arcs)  <= Deltah[h], 'ReRoutingDis_%s', % (h))
+        m.addConstr(((quicksum(x[h,i,j]+K[h,i,j]-2*x[h,i,j]*K[h,i,j] for i,j in arcs))/len(arcs))  <= Deltah[h], 'ReRoutingDis_%s' % (h))
     m.update()
     #Add Constraint to make sure \delta is 1 once both delta and theta can be one
     for h in demand_flows:
-        for in nodes:
-            m.addConstr(((quicksum(x[i,j,h] for j in nodes))/len(nodes)+ t[i] -1) <= Deltah[h] + Thetah[h] , 'Deltah_%s_%s', % (h, i) )
+        for i in nodes:
+            #print 'Neighbors:'
+            #print H.neighbors(i)
+            #print 'h,i,j:'
+            #print h,i,j 
+            m.addConstr(((quicksum(x[h,i,j] for j in H.neighbors(i)))/len(nodes)+ t[i] -1) <= (Deltah[h] + Thetah[h]) , 'Deltah_%s_%s' % (h, i) )
     m.update()
     #Add constraint to make sure the altered switches are marked with t_i = 1
     for i in nodes:
-        m.addConstr((quicksum(x[i,j,h]+K[i,j,h] -2*x[i,j,h]*K[i,j,h] for h in demand_flows for j in nodes)) <= t[i] , 'AlteredSwitch_%s', % (i))
+        m.addConstr(((quicksum(x[h,i,j]+K[h,i,j] -2*x[h,i,j]*K[h,i,j] for h in demand_flows for j in H.neighbors(i)))/(len(nodes)*len(demand_flows))) <= t[i] , 'AlteredSwitch_%s' % (i))
     m.update()
     #Add Constraint to make sure t_i is zero when both K[ij] and x[ij] are zero:
     for i in nodes:
-        m.addConstr((quicksum(x[i,j,h] + K[i,j,h] -2*x[i,j,h]*K[i,j,h] for h in demand_flows for j in nodes)) <= t[i] , 'ZerosAltSwitch_%s', % (i))
+        m.addConstr(t[i] <= (quicksum(x[h,i,j]+K[h,i,j] -2*x[h,i,j]*K[h,i,j] for h in demand_flows for j in H.neighbors(i))), 'ZerosAltSwitch_%s' % (i))
     m.update()
 
     """
@@ -320,7 +332,7 @@ def optimize_SDN(nodes,demand_flows,arcs,capacity,K,inflow, demand_value):
 
 
         my_used_arc={}#[]
-        my_altered_switches={}#[]
+        my_altered_switch={}#[]
         my_delta={}#[]
         my_theta={}#[]
         #Start finding the solution after the optimization for used arc in h:
@@ -331,12 +343,12 @@ def optimize_SDN(nodes,demand_flows,arcs,capacity,K,inflow, demand_value):
                 my_used_arc[i,j,h] =0
                 if var_reference.x>0 or var_reference_reverse.x>0:
                     This= (i,j,h)
-                    my_used_arc[i,jh] = 1
+                    my_used_arc[i,j,h] = 1
 
         #Start finding the solution for the altered switches:
         for i in nodes:
             var_reference = m.getVarByName('T_%s' %(i))
-            my_altered_switches[i] = 0
+            my_altered_switch[i] = 0
             if var_reference.x>0:
                 my_altered_switch[i] = 1
 
@@ -370,4 +382,4 @@ def optimize_SDN(nodes,demand_flows,arcs,capacity,K,inflow, demand_value):
                 if vertex_cost[i] !=0:
                     my_used_vertex.append(i)
         """
-        return my_altered_switches,my_used_arc, my_delta, my_theta
+        return my_altered_switch,my_used_arc, my_delta, my_theta
