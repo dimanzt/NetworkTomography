@@ -1,4 +1,4 @@
-__author__ = 'Utente'
+__author__ = 'Diman'
 #python_path='c:\\Python27\\python '
 #python_path='C:\Python27\python '
 
