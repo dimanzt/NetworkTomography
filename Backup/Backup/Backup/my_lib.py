@@ -4023,6 +4023,35 @@ def count_occurance(elem, path):
 
     return count
 
+def write_stat_SDN(path_to_stats,filename_stat,prob_edge,seed_random,alfa,
+                          SumDelta,SumTheta,OBJ, #Number of flows which get re-routed ,Number of flows which get delayed ,OPTIMAL Objective
+                          num_sim,
+                          flow_c_value,                                #Total demand of the graph. number of flows per each demand pair
+                          number_of_couple,                            #number of couples (demand pairs)
+                          Nodes,                                     #number of Nodes
+                          Edges):                                     #Number of Edges
+
+
+
+        path_to_file_stat=path_to_stats+filename_stat
+        print path_to_file_stat
+        if not os.path.exists(path_to_file_stat):
+            #print 'non esiste lo creo'
+            file=open(path_to_file_stat,'w+')
+            name_of_colunms="Seed\tAlfa\tSumDelta\tSumTheta\tOBJ\tOBJ\tNum_SIM\tNum_SIM\tNum_SIM\tNum_SIM\tNum_SIM\tNum_SIM\tNum_SIM\tFlow_c_value\tNumberofCouples\tNumberofNodes\tNumberofEdges\n"
+
+            file.write(name_of_colunms)
+            file.close
+
+
+        file=open(path_to_file_stat,'a')
+        raw_line=str(seed_random)+'\t\t'+str(alfa)+'\t\t'+str(SumDelta)+'\t\t'+str(SumTheta)+'\t\t'+str(OBJ)+'\t\t'+str(OBJ)+'\t\t'+str(num_sim)+'\t\t'+str(num_sim)+'\t\t'+str(num_sim)+'\t\t'+str(num_sim)+'\t\t'+str(num_sim)+'\t\t'+str(num_sim)+'\t\t'+str(num_sim)+'\t\t'+str(flow_c_value)+'\t\t'+str(number_of_couple)+'\t\t'+str(Nodes)+'\t\t'+str(Edges)+'\n'
+        file.write(raw_line)
+        file.close()
+
+
+
+
 def write_stat_monitors(path_to_stats,filename_stat,seed_random,alfa,
                           my_monitors, Num_Identi_link, MatrixRank, TotalCost, #Random generated monitor with a maximum of Monitors, Number of Identifiable links using shortest path 
                           Monitors, #Limit on Maximum number of monitors
