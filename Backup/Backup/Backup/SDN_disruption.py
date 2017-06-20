@@ -197,6 +197,7 @@ demand_flows=[]
 i=0
 for edge in green_edges:
     name_flow='F%d'%(i)
+    #name_flow = i
     demand_flows.append(name_flow)
     i+=1
 #Generate edges in graph H
@@ -253,6 +254,20 @@ print 'green_edges_1:'
 print green_edges_1
 print 'green_edges_2'
 print green_edges_2
+#########################################################################################################################
+demand_flows_1 = []
+i=0
+for edge in green_edges_1:
+    name_flow='F%d'%(i)
+    demand_flows_1.append(name_flow)
+    i+=1
+demand_flows_2 = []
+i=0
+for edge in green_edges_2:
+    name_flow='F%d'%(i)
+    demand_flows_2.append(name_flow)
+    i+=1
+
 #----------------------------------------------------------OPTIMAL-------------------------------------------------------
 print 'Inizio algoritmo OPTIMAL recovery'
 del H
@@ -273,7 +288,36 @@ green_edges=deepcopy(copy_of_green_edges)
 start_time_optimal=time.time()
 
 #optimal solution run one by one:
-[OBJ, Deltah, Thetah, H2, my_used_arcs] = optimal_SDN(H,green_edges_1, K)
+[OBJ, Deltah, Thetah, H2, my_used_arcs] = optimal_SDN(H,green_edges_1, K, demand_flows_1)
+i = 0
+for edge in green_edges_1:
+    #residual_graph=nx.MultiGraph(supply_graph)
+    source=edge[0]
+    target=edge[1]
+    #demand= edge[2]
+    arc=(source,target)
+    (length, path) = my_prob_single_source_dijkstra(H,distance_metric, source, target)
+    print 'Length'
+    print length
+    print 'Path:'
+    print path
+    try:
+      print 'Path:'
+      print path[target]
+      print type(path[target]), len(path[target]), path[target]
+      h = demand_flows_1[i]
+      for node in path[target]:
+          if node==source:
+              node_1 = node
+          else:
+              K[h, node_1, node] = 1
+              #K[h, node, node_1] = 1
+              node_1 = node
+    except KeyError:
+        raise nx.NetworkXNoPath("node %s not reachable from %s" % (source, target))
+
+
+
 print 'OBJECTIVE:'
 print OBJ
 print 'Deltah'
@@ -282,19 +326,23 @@ print 'Thetah'
 print Thetah
 print 'My Used Arcs:'
 print my_used_arcs
-for h in demand_flows:
+print 'Khij:'
+print K
+"""
+for h in demand_flows_1:
+    print 'h:'
+    print h
     for i,j in H.edges():#arcs:
-    #for h in demand_flows:
         K[h,i,j]= my_used_arcs[h,i,j]
         K[h,j,i]= my_used_arcs[h,i,j]
-
+"""
 ###################################################
 #Next round:######################################
 OBJ = 0
 Deltah = []
 Thetah = []
 my_used_arcs = []
-[OBJ, Deltah, Thetah, H3, my_used_arcs] = optimal_SDN(H2,green_edges_2, K)
+[OBJ, Deltah, Thetah, H3, my_used_arcs] = optimal_SDN(H,green_edges, K, demand_flows)
 print 'OBJECTIVE:'
 print OBJ
 print 'Deltah'
