@@ -5,7 +5,7 @@ __author__ = 'Diman Zad Tootaghaj'
 from gurobipy import *
 
 # Model data, get the nodes and capacity from a graph H
-def optimal_SDN(H,green_edges, K, demand_flows):
+def optimal_SDN(H,green_edges, K, demand_flows, w_l, w_h):
     print "Start running the ILP formulation for SDN recovery"
     nodes=[]
     #construct the array nodes:
@@ -156,7 +156,7 @@ def optimal_SDN(H,green_edges, K, demand_flows):
     my_theta=[]
 
     #Deltah, Thetah, Used_Edges
-    my_altered_switches,my_used_arc, my_delta, my_theta =optimize_SDN(H,nodes,demand_flows,arcs,capacity,K,inflow, demand_value)
+    my_altered_switches,my_used_arc, my_delta, my_theta =optimize_SDN(H,nodes,demand_flows,arcs,capacity,K,inflow, demand_value, w_l, w_h)
 
     print 'Rerouted flows'
     print my_delta #Deltah
@@ -188,17 +188,17 @@ def optimal_SDN(H,green_edges, K, demand_flows):
     for i in demand_flows:
       print 'Delta:'
       print my_delta[i]
-      Objective = w_high*float(my_delta[i]) + Objective
+      Objective = w_h*float(my_delta[i]) + Objective
     #for i in range(0, len(my_theta)): #Thetah:
     for i in demand_flows:
       print 'Theta:'
       print my_theta[i]
-      Objective = w_low*float(my_theta[i]) + Objective
+      Objective = w_l*float(my_theta[i]) + Objective
     return Objective, my_delta, my_theta, H, my_used_arc #Deltah, Thetah, H
 
 
 
-def optimize_SDN(H,nodes,demand_flows,arcs,capacity,K,inflow, demand_value):
+def optimize_SDN(H,nodes,demand_flows,arcs,capacity,K,inflow, demand_value, w_l, w_h):
 
     dmax=100
     print 'USED EDGES:'
@@ -210,20 +210,20 @@ def optimize_SDN(H,nodes,demand_flows,arcs,capacity,K,inflow, demand_value):
     #X_ij is a variable that shows which edges will be used after the optimization
     for h in demand_flows:
         for i,j in arcs:
-            x[h,i,j] = m.addVar(ub=1, obj=0.2, vtype=GRB.BINARY,
+            x[h,i,j] = m.addVar(ub=1, obj=1, vtype=GRB.BINARY,
                                    name='x_%s_%s_%s' % (h, i, j))
-            x[h,j,i] = m.addVar(ub=1, obj=0.2, vtype=GRB.BINARY,
+            x[h,j,i] = m.addVar(ub=1, obj=1, vtype=GRB.BINARY,
                                    name='x_r_%s_%s_%s' % (h, j, i))
     m.update()
     #Add Deltah for re-routing cost which has a higher cost, we give 2 
     Deltah = {}
     for h in demand_flows:
-        Deltah[h] = m.addVar(ub=1, obj=2.0, vtype=GRB.BINARY, name='Deltah_%s' % (h))
+        Deltah[h] = m.addVar(ub=1, obj=w_h, vtype=GRB.BINARY, name='Deltah_%s' % (h)) # 2.0
     m.update()
     #Add Thetah for existing flows which are not being re-routed but cross through an updated switch we give lower cost (1) to them
     Thetah = {}
     for h in demand_flows:
-        Thetah[h] = m.addVar(ub=1, obj=1.0, vtype=GRB.BINARY, name='Thetah_%s' % (h))
+        Thetah[h] = m.addVar(ub=1, obj=w_l, vtype=GRB.BINARY, name='Thetah_%s' % (h)) # 1.0
     m.update()
     #Add and auxiulary variable to indicate altered switches:
     t = {}
@@ -281,9 +281,12 @@ def optimize_SDN(H,nodes,demand_flows,arcs,capacity,K,inflow, demand_value):
             m.addConstr( (quicksum(x[h,k,i] for k in H.neighbors(i)) + inflow[h,i]) == (quicksum(x[h,i,j] for j in H.neighbors(i))),'node_%s_%s' % (h, i))
 
     m.update()
-
+    print 'Demand Value:'
+    print demand_value
     # Arc capacity constraints 
     for i,j in arcs:
+        print 'Capacity:'
+        print capacity[i,j]
         m.addConstr(quicksum(x[h,i,j]*demand_value[h]+x[h,j,i]*demand_value[h] for h in demand_flows) <= capacity[i,j], 'cap_%s_%s' % (i, j))
     m.update()
     #Add Constraint to ensure one disruption is counted at a time
