@@ -288,7 +288,9 @@ green_edges=deepcopy(copy_of_green_edges)
 start_time_optimal=time.time()
 
 #optimal solution run one by one:
-[OBJ, Deltah, Thetah, H2, my_used_arcs] = optimal_SDN(H,green_edges_1, K, demand_flows_1)
+w_l = 0
+w_h = 0
+[OBJ, Deltah, Thetah, H2, my_used_arcs] = optimal_SDN(H,green_edges_1, K, demand_flows_1, w_l, w_h)
 i = 0
 for edge in green_edges_1:
     #residual_graph=nx.MultiGraph(supply_graph)
@@ -326,6 +328,11 @@ print 'Thetah'
 print Thetah
 print 'My Used Arcs:'
 print my_used_arcs
+for h in demand_flows_1:
+    for i,j in H.edges():
+        K[h,i,j] = 0
+        if (my_used_arcs[h,i,j] ==1):
+            K[h,i,j] = 1
 print 'Khij:'
 print K
 """
@@ -342,14 +349,22 @@ OBJ = 0
 Deltah = []
 Thetah = []
 my_used_arcs = []
-[OBJ, Deltah, Thetah, H3, my_used_arcs] = optimal_SDN(H,green_edges, K, demand_flows)
+w_l = 100
+w_h = 200
+[OBJ, Deltah, Thetah, H3, my_used_arcs] = optimal_SDN(H,green_edges, K, demand_flows, w_l, w_h)
 print 'OBJECTIVE:'
 print OBJ
 print 'Deltah'
 print Deltah
 print 'Thetah'
 print Thetah
-
+for h in demand_flows:
+    SumDelta= SumDelta + Deltah[h]
+    SumTheta = SumTheta + Thetah[h]
+print 'Sum Theta:'
+print SumTheta
+print 'Sum Delta:'
+print SumDelta
 time_elapsed_optimal=round(time.time() - start_time_optimal,3)
 print("--- %s seconds ---" % str(time_elapsed_optimal))
 write_stat_time_simulation(path_to_stat_times,'OPT',filename_graph,int(sys.argv[5]),int(sys.argv[4]),seed_passed,number_of_couple,time_elapsed_optimal)
