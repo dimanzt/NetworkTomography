@@ -47,7 +47,7 @@ prob_edge_passed=sys.argv[3]
 distance_metric_passed=sys.argv[6]
 type_of_bet_passed=sys.argv[7]
 flow_c_fixed=sys.argv[8]
-flow_c_value=int(sys.argv[9])
+flow_c_value=float(sys.argv[9]) #int(sys.argv[9])
 number_of_couple=int(sys.argv[10])
 fixed_distruption=str(sys.argv[11])
 var_distruption=float(sys.argv[12])
@@ -224,10 +224,10 @@ for edge in H.edges():
                 print arc
 
 arcs = tuplelist(arcs)
-print 'arcs:'
-print arcs
-print 'Edges of the graph H:'
-print H.edges()
+#print 'arcs:'
+#print arcs
+#print 'Edges of the graph H:'
+#print H.edges()
 #########################################################################################################################
 K= {}
 for h in demand_flows:
@@ -236,7 +236,7 @@ for h in demand_flows:
         K[h,i,j]= 0
         K[h,j,i]= 0
 ##########Divide the green edges into two parts: First part is used to make the initial routing and second part is used to update the SDN switches:
-half_greens= len(green_edges)/2
+half_greens= len(green_edges)/2# -1 #len(green_edges)-2 #len(green_edges)/2
 count = 0
 green_edges_1 = []
 green_edges_2 = []
@@ -312,14 +312,37 @@ for edge in green_edges_1:
           if node==source:
               node_1 = node
           else:
-              K[h, node_1, node] = 1
+              ###K[h, node_1, node] = 1
               #K[h, node, node_1] = 1
               node_1 = node
     except KeyError:
         raise nx.NetworkXNoPath("node %s not reachable from %s" % (source, target))
-
-
-
+demand_flows_this = []
+This_green = []
+i = 0
+"""
+for edge in green_edges_1:
+    #demand_flows_this = []
+    #This_green = []
+    This_green.append(edge)
+    SumDelta = 0
+    SumTheta = 0
+    OBJ = 0
+    Deltah = []
+    Thetah = []
+    my_used_arcs = []
+    name_flow='F%d'%(i)
+    demand_flows_this.append(name_flow)
+    i+=1
+    [OBJ, Deltah, Thetah, H2, my_used_arcs] = optimal_SDN(H,This_green, K, demand_flows_this, w_l, w_h)
+    for h in demand_flows_1:
+        for i,j in H.edges():
+            K[h,i,j] = 0
+            if (my_used_arcs[h,i,j] ==1):
+                K[h,i,j] = 1
+            if (my_used_arcs[h,j,i] ==1):
+                K[h,j,i] = 1
+"""
 print 'OBJECTIVE:'
 print OBJ
 print 'Deltah'
@@ -328,11 +351,17 @@ print 'Thetah'
 print Thetah
 print 'My Used Arcs:'
 print my_used_arcs
+#Diman: Uncomment here if you want not to use Dijkstra's shortest path
+#K= my_used_arcs
+
 for h in demand_flows_1:
     for i,j in H.edges():
         K[h,i,j] = 0
         if (my_used_arcs[h,i,j] ==1):
             K[h,i,j] = 1
+        if (my_used_arcs[h,j,i] ==1):
+            K[h,j,i] = 1
+
 print 'Khij:'
 print K
 """
@@ -349,8 +378,8 @@ OBJ = 0
 Deltah = []
 Thetah = []
 my_used_arcs = []
-w_l = 100
-w_h = 200
+w_l = 100#0.001 #100
+w_h = 200#0.002 #200
 [OBJ, Deltah, Thetah, H3, my_used_arcs] = optimal_SDN(H,green_edges, K, demand_flows, w_l, w_h)
 print 'OBJECTIVE:'
 print OBJ
@@ -365,6 +394,9 @@ print 'Sum Theta:'
 print SumTheta
 print 'Sum Delta:'
 print SumDelta
+print 'My Used Arcs:'
+print my_used_arcs
+
 time_elapsed_optimal=round(time.time() - start_time_optimal,3)
 print("--- %s seconds ---" % str(time_elapsed_optimal))
 write_stat_time_simulation(path_to_stat_times,'OPT',filename_graph,int(sys.argv[5]),int(sys.argv[4]),seed_passed,number_of_couple,time_elapsed_optimal)
