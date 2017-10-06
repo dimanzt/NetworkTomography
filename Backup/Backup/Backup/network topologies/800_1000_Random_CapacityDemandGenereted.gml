@@ -1,72 +1,86 @@
 graph [
   node [
-    id 613
-    label "613"
-  ]
-  node [
-    id 8
-    label "8"
-  ]
-  node [
-    id 45
-    label "45"
-  ]
-  node [
-    id 47
-    label "47"
-  ]
-  node [
-    id 597
-    label "597"
-  ]
-  node [
-    id 599
-    label "599"
-  ]
-  node [
-    id 24
-    label "24"
+    id 609
+    label "609"
   ]
   node [
     id 667
     label "667"
   ]
   node [
+    id 581
+    label "581"
+  ]
+  node [
+    id 577
+    label "577"
+  ]
+  node [
+    id 584
+    label "584"
+  ]
+  node [
+    id 9
+    label "9"
+  ]
+  node [
+    id 12
+    label "12"
+  ]
+  node [
+    id 8
+    label "8"
+  ]
+  node [
+    id 24
+    label "24"
+  ]
+  node [
+    id 59
+    label "59"
+  ]
+  node [
     id 732
     label "732"
   ]
   node [
-    id 63
-    label "63"
+    id 5
+    label "5"
   ]
   edge [
-    source 613
-    target 63
+    source 609
+    target 59
     type "green"
-    demand 1
+    demand 20.0
   ]
   edge [
-    source 8
-    target 667
+    source 667
+    target 8
     type "green"
-    demand 1
+    demand 20.0
   ]
   edge [
-    source 45
-    target 597
+    source 581
+    target 9
     type "green"
-    demand 1
+    demand 20.0
   ]
   edge [
-    source 47
-    target 599
+    source 577
+    target 5
     type "green"
-    demand 1
+    demand 20.0
+  ]
+  edge [
+    source 584
+    target 12
+    type "green"
+    demand 20.0
   ]
   edge [
     source 24
     target 732
     type "green"
-    demand 1
+    demand 20.0
   ]
 ]
