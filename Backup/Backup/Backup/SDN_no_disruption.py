@@ -349,8 +349,8 @@ OBJ = 0
 Deltah = []
 Thetah = []
 my_used_arcs = []
-w_l = 100
-w_h = 200
+w_l = 0#100
+w_h = 0#200
 [OBJ, Deltah, Thetah, H3, my_used_arcs] = optimal_SDN(H,green_edges, K, demand_flows, w_l, w_h)
 print 'OBJECTIVE:'
 print OBJ
