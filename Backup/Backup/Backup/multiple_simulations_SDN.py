@@ -59,7 +59,7 @@ if num_couple_passed!=-1:
 
 else:
     num_couple_fix=False
-    number_of_couple=1
+    number_of_couple=2
 
 fixed_distruption=True
 
@@ -67,7 +67,7 @@ fixed_distruption=True
 prob_edge=0.002
 prob_edge_fixed=True
 
-num_simulations=10
+num_simulations=1
 name_of_program_simulation='SDN_disruption.py'
 
 name_of_program_images='genera_immagini.py'
@@ -86,7 +86,7 @@ size_array_seed=20
 seed_array=[]
 
 if seed_fixed==False:
-    for i in range(220,220+10,1):
+    for i in range(222,222+1,1):
         seed_array.append(i)
 else:
     seed_array.append(seed)
@@ -95,7 +95,7 @@ if flow_fixed==True:
     flow_c=5
 
 if num_couple_fix==False:
-    number_of_couple=1
+    number_of_couple=2
 
 
 #number_of_couple=2
@@ -107,13 +107,13 @@ for i in range(0,num_simulations,1):
         alpha+=0.2
 
     if num_couple_fix==False:
-        number_of_couple+=1
+        number_of_couple+=0
 
     if flow_fixed==False:
-        flow_c+=0
+        flow_c+=1
 
     if fixed_distruption==False:
-        var_distruption+=15
+        var_distruption+=0
 
     for seed_elem in seed_array:
         #esegui una simulazione
