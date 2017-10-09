@@ -52,7 +52,7 @@ alpha=0.0
 alpha_fixed=False
 #flow_fixed=True
 flow_fixed=False
-flow_c=0
+flow_c=6
 if num_couple_passed!=-1:
     num_couple_fix=True
     number_of_couple=num_couple_passed
@@ -67,7 +67,7 @@ fixed_distruption=True
 prob_edge=0.002
 prob_edge_fixed=True
 
-num_simulations=1
+num_simulations=10
 name_of_program_simulation='Greedy_Min_touch.py'#'SDN_disruption.py'
 
 name_of_program_images='genera_immagini.py'
@@ -92,7 +92,7 @@ else:
     seed_array.append(seed)
 
 if flow_fixed==True:
-    flow_c=0
+    flow_c=6
 
 if num_couple_fix==False:
     number_of_couple=6
