@@ -9,7 +9,7 @@ import time
 from scipy import stats
 from my_lib import *
 from my_flows_lib import *
-#from my_lib_optimal_ILP_SDN import *
+from my_lib_optimal_ILP_SDN import *
 from my_lib_optimal_ILP_SDN_Greedy import *
 #from my_lib_optimal_recovery import *
 #from my_lib_optimal_expected_recovery import *
@@ -394,6 +394,9 @@ for g in green_edges:
     if g not in green_edges_1:
         New_demands.append(g)
 """
+Old_demand_flows = []
+for d in demand_flows_1:
+  Old_demand_flows.append(d)
 New_demand_flows = demand_flows_1
 print 'Length New demand flows:'
 print len(New_demand_flows)
@@ -425,7 +428,7 @@ for g in New_demands:
     print len(Loop_green_edges)
     print 'Length New demand flows:'
     print len(New_demand_flows)
-    [OBJ, New_Deltah, New_Thetah, H3, my_used_arcs] = optimal_SDN(H,Loop_green_edges, K, New_demand_flows, w_l, w_h)
+    [OBJ, New_Deltah, New_Thetah, H3, my_used_arcs] = optimal_SDN_Greedy(H,Loop_green_edges, K, New_demand_flows, w_l, w_h, Old_demand_flows)
     for h in Old_demand_flows:#New_demand_flows:#New_demand_flows:#range(1,len(New_demand_flows)+1):
         print 'h:'
         print h
