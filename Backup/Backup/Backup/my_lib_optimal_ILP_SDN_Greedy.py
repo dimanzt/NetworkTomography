@@ -5,7 +5,7 @@ __author__ = 'Diman Zad Tootaghaj'
 from gurobipy import *
 
 # Model data, get the nodes and capacity from a graph H
-def optimal_SDN(H,green_edges, K, demand_flows, w_l, w_h):
+def optimal_SDN_Greedy(H,green_edges, K, demand_flows, w_l, w_h, Old_demand_flows):
     print "Start running the ILP formulation for SDN recovery"
     nodes=[]
     #construct the array nodes:
@@ -156,7 +156,7 @@ def optimal_SDN(H,green_edges, K, demand_flows, w_l, w_h):
     my_theta=[]
 
     #Deltah, Thetah, Used_Edges
-    my_altered_switches,my_used_arc, my_delta, my_theta =optimize_SDN(H,nodes,demand_flows,arcs,capacity,K,inflow, demand_value, w_l, w_h)
+    my_altered_switches,my_used_arc, my_delta, my_theta =optimize_SDN(H,nodes,demand_flows,arcs,capacity,K,inflow, demand_value, w_l, w_h, Old_demand_flows)
 
     print 'Rerouted flows'
     print my_delta #Deltah
@@ -198,7 +198,7 @@ def optimal_SDN(H,green_edges, K, demand_flows, w_l, w_h):
 
 
 
-def optimize_SDN(H,nodes,demand_flows,arcs,capacity,K,inflow, demand_value, w_l, w_h):
+def optimize_SDN(H,nodes,demand_flows,arcs,capacity,K,inflow, demand_value, w_l, w_h, Old_demand_flows):
 
     dmax=100
     #print 'USED EDGES:'
@@ -218,7 +218,11 @@ def optimize_SDN(H,nodes,demand_flows,arcs,capacity,K,inflow, demand_value, w_l,
     #Add Deltah for re-routing cost which has a higher cost, we give 2 
     Deltah = {}
     for h in demand_flows:
-        Deltah[h] = m.addVar(ub=1, obj=w_h, vtype=GRB.BINARY, name='Deltah_%s' % (h)) # 2.0
+        if h not in Old_demand_flows:
+            Deltah[h] = m.addVar(ub=1, obj=w_h, vtype=GRB.BINARY, name='Deltah_%s' % (h)) # 2.0
+    m.update()
+    for h in Old_demand_flows:
+        Deltah[h] = m.addVar(ub=0, lb=0, obj=w_h, vtype=GRB.BINARY, name='Deltah_%s' % (h)) # 2.0
     m.update()
     #Add Thetah for existing flows which are not being re-routed but cross through an updated switch we give lower cost (1) to them
     Thetah = {}
@@ -301,8 +305,8 @@ def optimize_SDN(H,nodes,demand_flows,arcs,capacity,K,inflow, demand_value, w_l,
         for (i,j) in arcs:
             if (K[h,i,j] ==1):
                 m.addConstr(x[h,i,j] == 1, 'NoChange')
-            if (K(h,j,i) == 1):
-                m.addConstr(x[h,j,i] == 1, 'NoChangeR')
+            #if (K(h,j,i) == 1):
+            #    m.addConstr(x[h,j,i] == 1, 'NoChangeR')
     m.update()
     #Add Constraint to make sure \delta is 1 once both delta and theta can be one
     for h in demand_flows:
