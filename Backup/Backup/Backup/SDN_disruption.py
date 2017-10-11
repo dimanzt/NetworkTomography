@@ -10,6 +10,7 @@ from scipy import stats
 from my_lib import *
 from my_flows_lib import *
 from my_lib_optimal_ILP_SDN import *
+from my_lib_optimal_ILP_Max_route import *
 #from my_lib_optimal_recovery import *
 #from my_lib_optimal_expected_recovery import *
 #from my_lib_optimal_approx_max_flow import *
@@ -290,7 +291,8 @@ start_time_optimal=time.time()
 #optimal solution run one by one:
 w_l = 0
 w_h = 0
-[OBJ, Deltah, Thetah, H2, my_used_arcs] = optimal_SDN(H,green_edges_1, K, demand_flows_1, w_l, w_h)
+#[OBJ, Deltah, Thetah, H2, my_used_arcs] = optimal_SDN(H,green_edges_1, K, demand_flows_1, w_l, w_h)
+[OBJ, Deltah, Thetah, H2, my_used_arcs] = optimal_SDN_Max(H,green_edges_1, K, demand_flows_1, w_l, w_h)
 i = 0
 for edge in green_edges_1:
     #residual_graph=nx.MultiGraph(supply_graph)
