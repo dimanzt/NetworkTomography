@@ -9488,7 +9488,7 @@ def compute_lenght_of_path(H,path):
 def assign_random_capacity_to_edges(H,filename):
 
     for edge in H.edges():
-        random_cap=random.randint(20,30) #(20,50) bood
+        random_cap=random.randint(20,100) #(20,50) bood
         #random_cap=1000
         H[edge[0]][edge[1]][0]['capacity']=random_cap
 
