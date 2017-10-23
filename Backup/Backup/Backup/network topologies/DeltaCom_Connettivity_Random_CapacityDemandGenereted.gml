@@ -1,47 +1,35 @@
 graph [
   node [
-    id 4
-    label "4"
+    id 1
+    label "1"
+  ]
+  node [
+    id 3
+    label "3"
   ]
   node [
     id 9
     label "9"
   ]
   node [
-    id 11
-    label "11"
+    id 14
+    label "14"
   ]
   node [
-    id 19
-    label "19"
+    id 15
+    label "15"
   ]
   node [
-    id 20
-    label "20"
-  ]
-  node [
-    id 25
-    label "25"
-  ]
-  node [
-    id 27
-    label "27"
-  ]
-  node [
-    id 29
-    label "29"
+    id 21
+    label "21"
   ]
   node [
     id 31
     label "31"
   ]
   node [
-    id 35
-    label "35"
-  ]
-  node [
-    id 36
-    label "36"
+    id 33
+    label "33"
   ]
   node [
     id 40
@@ -52,40 +40,36 @@ graph [
     label "41"
   ]
   node [
-    id 42
-    label "42"
-  ]
-  node [
-    id 46
-    label "46"
+    id 45
+    label "45"
   ]
   node [
     id 47
     label "47"
   ]
   node [
-    id 54
-    label "54"
+    id 48
+    label "48"
+  ]
+  node [
+    id 52
+    label "52"
   ]
   node [
     id 58
     label "58"
   ]
   node [
-    id 65
-    label "65"
+    id 60
+    label "60"
+  ]
+  node [
+    id 62
+    label "62"
   ]
   node [
     id 66
     label "66"
-  ]
-  node [
-    id 67
-    label "67"
-  ]
-  node [
-    id 68
-    label "68"
   ]
   node [
     id 70
@@ -96,32 +80,46 @@ graph [
     label "72"
   ]
   node [
-    id 76
-    label "76"
+    id 74
+    label "74"
   ]
   node [
-    id 78
-    label "78"
+    id 75
+    label "75"
   ]
   node [
-    id 81
-    label "81"
+    id 85
+    label "85"
   ]
   node [
-    id 91
-    label "91"
+    id 90
+    label "90"
+  ]
+  node [
+    id 92
+    label "92"
   ]
   node [
     id 95
     label "95"
   ]
   node [
-    id 109
-    label "109"
+    id 106
+    label "106"
+  ]
+  node [
+    id 108
+    label "108"
   ]
   edge [
-    source 4
-    target 109
+    source 1
+    target 108
+    type "green"
+    demand 10.0
+  ]
+  edge [
+    source 3
+    target 106
     type "green"
     demand 10.0
   ]
@@ -132,26 +130,14 @@ graph [
     demand 10.0
   ]
   edge [
-    source 11
-    target 20
+    source 14
+    target 33
     type "green"
     demand 10.0
   ]
   edge [
-    source 19
-    target 27
-    type "green"
-    demand 10.0
-  ]
-  edge [
-    source 25
-    target 68
-    type "green"
-    demand 10.0
-  ]
-  edge [
-    source 29
-    target 65
+    source 15
+    target 21
     type "green"
     demand 10.0
   ]
@@ -162,26 +148,14 @@ graph [
     demand 10.0
   ]
   edge [
-    source 35
-    target 67
-    type "green"
-    demand 10.0
-  ]
-  edge [
-    source 36
-    target 42
-    type "green"
-    demand 10.0
-  ]
-  edge [
     source 40
     target 66
     type "green"
     demand 10.0
   ]
   edge [
-    source 46
-    target 78
+    source 45
+    target 74
     type "green"
     demand 10.0
   ]
@@ -192,8 +166,20 @@ graph [
     demand 10.0
   ]
   edge [
-    source 54
-    target 76
+    source 48
+    target 85
+    type "green"
+    demand 10.0
+  ]
+  edge [
+    source 52
+    target 62
+    type "green"
+    demand 10.0
+  ]
+  edge [
+    source 60
+    target 92
     type "green"
     demand 10.0
   ]
@@ -204,8 +190,8 @@ graph [
     demand 10.0
   ]
   edge [
-    source 81
-    target 91
+    source 75
+    target 90
     type "green"
     demand 10.0
   ]
