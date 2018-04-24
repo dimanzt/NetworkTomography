@@ -251,7 +251,7 @@ for h in demand_flows:
         K[h,i,j]= 0
         K[h,j,i]= 0
 ##########Divide the green edges into two parts: First part is used to make the initial routing and second part is used to update the SDN switches:
-half_greens= len(green_edges)/2# -1 #len(green_edges)-2 #len(green_edges)/2
+half_greens=len(green_edges)/2# -1 #len(green_edges)-2 #len(green_edges)/2
 count = 0
 green_edges_1 = []
 green_edges_2 = []
@@ -425,7 +425,7 @@ my_used_arcs = []
 w_l = 100#0.001 #100
 w_h = 200#0.002 #200
 Thr= Min_Hops*error #len(arcs)*disruption_value #var_distruption #len(arcs)/2
-Thrh= float(Thr)/float(len(demand_flows))#Thrh*len(demand_flows)*0.8
+Thrh= 1.5*float(Thr)/float(len(demand_flows))#Thrh*len(demand_flows)*0.8
 #Thr = Thrh*len(demand_flows)
 print 'Thr and Thrh: HEEEEEEEEEEEEEEEEEEEEEREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE'
 print Thrh, Thr, error
@@ -462,7 +462,7 @@ write_stat_time_simulation(path_to_stat_times,'OPT',filename_graph,int(sys.argv[
 #sys.exit(0)
 #Gap=time_elapsed_optimal/(len(nodes_recovered_optimal)*100)
 #---------------------------------------------------------Expected -OPTIMAL-------------------------------------------------------
-filename_stat='stat_simulations_'+filename_graph+"_Prob_"+str(prob_edge)+"_Alpha_"+str(alfa)+"_KHOP_"+str(K_HOPS)+"_distance_metric_"+str(distance_metric_passed)+"_type_of_bet_"+str(type_of_bet_passed)+"_always_put_monitor_"+str(always_split)+"_randomDisruption_"+str(random_disruption)+"_disruption_value_"+str(disruption_value)+"_error_"+str(error)+".txt"
+filename_stat='stat_simulations_Asynch_'+filename_graph+"_Prob_"+str(prob_edge)+"_Alpha_"+str(alfa)+"_KHOP_"+str(K_HOPS)+"_distance_metric_"+str(distance_metric_passed)+"_type_of_bet_"+str(type_of_bet_passed)+"_always_put_monitor_"+str(always_split)+"_randomDisruption_"+str(random_disruption)+"_disruption_value_"+str(disruption_value)+"_error_"+str(error)+".txt"
 
 #numero della simulazione corrente e scrivo statistiche
 num_sim=get_num_simulation(path_to_file_simulation)
