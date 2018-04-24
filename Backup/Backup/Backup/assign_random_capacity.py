@@ -15,8 +15,8 @@ from my_lib_check_routability import *
 from my_lib_compute_max_demand_in_the_graph import *
 
 #filename_graph= '600_800_Random_Capacity'
-filename_graph='erdos_renyi_graph_100_nodes_231_edges_Random' #'Abilene'
-
+filename_graph='erdos_renyi_graph_100_nodes_2977_edges_Diman'#'DeltaCom_Connettivity_Random_Capacity_High'#'erdos_renyi_graph_100_nodes_231_edges_Random' #'Abilene'
+# erdos_renyi_graph_100_nodes_2977_edges
 path_to_graph= 'network topologies/'
 path_to_graph=path_to_graph+filename_graph+'.gml'
 H=nx.MultiGraph(nx.read_gml(path_to_graph))
