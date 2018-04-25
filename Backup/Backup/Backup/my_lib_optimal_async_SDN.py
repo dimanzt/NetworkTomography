@@ -7,7 +7,7 @@ import networkx as nx
 import random
 
 # Model data, get the nodes and capacity from a graph H
-def optimal_SDN_LP(H,green_edges, K, demand_flows, w_l, w_h, Thrh, Thr):
+def optimal_SDN_LP(H,green_edges, K, demand_flows, w_l, w_h, Thrh, Thr, weights):
     print "Start running the ILP formulation for SDN recovery"
     nodes=[]
     #construct the array nodes:
@@ -162,7 +162,7 @@ def optimal_SDN_LP(H,green_edges, K, demand_flows, w_l, w_h, Thrh, Thr):
 
     #Deltah, Thetah, Used_Edges
     #Time,my_used_arc, my_delta, MaxCong =optimize_SDN(H,nodes,demand_flows,green_edges,arcs,capacity,K,inflow, demand_value, w_l, w_h, Thrh, Thr)
-    Max_Time,my_used_arc, my_delta, Total_Hop, Total_ReRouted = optimize_SDN(H,nodes,demand_flows,green_edges,arcs,capacity,K,inflow, demand_value, w_l, w_h, Thrh, Thr)
+    Max_Time,my_used_arc, my_delta, Total_Hop, Total_ReRouted = optimize_SDN(H,nodes,demand_flows,green_edges,arcs,capacity,K,inflow, demand_value, w_l, w_h, Thrh, Thr, weights)
     print 'Rerouted flows'
     print my_delta #Deltah
     print 'Delayed flows'
@@ -205,7 +205,7 @@ def optimal_SDN_LP(H,green_edges, K, demand_flows, w_l, w_h, Thrh, Thr):
 
 
 
-def optimize_SDN(H,nodes,demand_flows,green_edges,arcs,capacity,K,inflow, demand_value, w_l, w_h, Thrh, Thr):
+def optimize_SDN(H,nodes,demand_flows,green_edges,arcs,capacity,K,inflow, demand_value, w_l, w_h, Thrh, Thr, weights):
 
     dmax=100
     #print 'USED EDGES:'
@@ -224,8 +224,11 @@ def optimize_SDN(H,nodes,demand_flows,green_edges,arcs,capacity,K,inflow, demand
     m.update()
     #Add Deltah for re-routing cost which has a higher cost, we give 2 
     Deltah = {}
+    i = 0
     for h in demand_flows:
-        Deltah[h] = m.addVar(ub=1, obj=w_h, vtype=GRB.BINARY, name='Deltah_%s' % (h)) # 2.0
+        Deltah[h] = m.addVar(ub=1, obj=100*weights[i], vtype=GRB.BINARY, name='Deltah_%s' % (h)) # 2.0
+        #Deltah[h] = m.addVar(ub=1, obj=100, vtype=GRB.BINARY, name='Deltah_%s' % (h)) # 2.0
+        i = i + 1
     m.update()
     #Add Thetah for existing flows which are not being re-routed but cross through an updated switch we give lower cost (1) to them
     #Thetah = {}
