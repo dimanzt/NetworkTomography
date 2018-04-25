@@ -211,7 +211,7 @@ def optimize_SDN_Max(H,nodes,demand_flows,arcs,capacity,K,inflow, demand_value, 
     #X_ij is a variable that shows which edges will be used after the optimization
     for h in demand_flows:
         for i,j in arcs:
-            r = capacity[i,j] #random.randint(0,300)
+            r = random.randint(0,300)#capacity[i,j] #random.randint(0,300)
             x[h,i,j] = m.addVar(ub=1, obj=r, vtype=GRB.BINARY,
                                    name='x_%s_%s_%s' % (h, i, j))
             x[h,j,i] = m.addVar(ub=1, obj=r, vtype=GRB.BINARY,
@@ -281,7 +281,6 @@ def optimize_SDN_Max(H,nodes,demand_flows,arcs,capacity,K,inflow, demand_value, 
             #print inflow[h,i], h
             #m.addConstr( (quicksum(x[h,k,i] for k,i in to_i) + inflow[h,i]) == (quicksum(x[h,i,j] for i,j in from_i)),'node_%s_%s' % (h, i))
             m.addConstr( (quicksum(x[h,k,i] for k in H.neighbors(i)) + inflow[h,i]) == (quicksum(x[h,i,j] for j in H.neighbors(i))),'node_%s_%s' % (h, i))
-
     m.update()
     print 'Demand Value:'
     print demand_value
@@ -290,6 +289,7 @@ def optimize_SDN_Max(H,nodes,demand_flows,arcs,capacity,K,inflow, demand_value, 
         #print 'Capacity:'
         #print capacity[i,j]
         m.addConstr(quicksum(x[h,i,j]*demand_value[h]+x[h,j,i]*demand_value[h] for h in demand_flows) <= capacity[i,j], 'cap_%s_%s' % (i, j))
+        #m.addConstr(quicksum(x[h,i,j]+x[h,j,i] for h in demand_flows) <= 4, 'EDP_%s_%s' % (i, j))
     m.update()
     #Add Constraint to ensure one disruption is counted at a time
     for h in demand_flows:
@@ -334,6 +334,7 @@ def optimize_SDN_Max(H,nodes,demand_flows,arcs,capacity,K,inflow, demand_value, 
 
     m.update()
     """
+    #m.ModelSense = GRB.MAXIMIZE
     m.optimize()
 
     if m.status == GRB.status.OPTIMAL:
