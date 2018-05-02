@@ -206,11 +206,11 @@ i = 0
 weights = []
 for e in demand_flows:
   if(i/float(len(demand_flows)) <=0.4):
-    weights.append(100)
+    weights.append(1)#100
   if((i/float(len(demand_flows)) >=0.4) and (i/float(len(demand_flows)) <=0.5)):
     weights.append(1)
   if((i/float(len(demand_flows)) >=0.5) and (i/float(len(demand_flows)) <=0.9)):
-    weights.append(100)
+    weights.append(1) #100
   if((i/float(len(demand_flows)) >=0.9) and (i/float(len(demand_flows)) <=1)):
     weights.append(1)
   i+=1
