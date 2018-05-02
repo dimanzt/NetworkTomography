@@ -227,7 +227,7 @@ def optimize_SDN(H,nodes,demand_flows,green_edges,arcs,capacity,K,inflow, demand
     BigDeltah = {}
     i = 0
     for h in demand_flows:
-        BigDeltah[h] = m.addVar(ub=len(demand_flows), obj=100*weights[i], vtype=GRB.CONTINUOUS, name='BigDeltah_%s' % (h)) # 2.0
+        BigDeltah[h] = m.addVar(ub=len(demand_flows), obj=w_h*weights[i], vtype=GRB.CONTINUOUS, name='BigDeltah_%s' % (h)) # 2.0
         Deltah[h] = m.addVar(ub=1, obj=0, vtype=GRB.BINARY, name='Deltah_%s' % (h)) # 2.0
         i = i + 1
     m.update()
