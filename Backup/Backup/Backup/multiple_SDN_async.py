@@ -59,7 +59,7 @@ if num_couple_passed!=-1:
 
 else:
     num_couple_fix=False
-    number_of_couple=32
+    number_of_couple=0
 
 fixed_distruption=True
 fixed_error = False
@@ -67,8 +67,8 @@ fixed_error = False
 prob_edge=0.002
 prob_edge_fixed=True
 
-num_simulations=10
-name_of_program_simulation='SDN_2018_async.py'#'SDN_2018_demand_loss.py'#'SDN_2018.py'#'Greedy_Min_touch.py'#'SDN_disruption.py'
+num_simulations=20
+name_of_program_simulation='SDN_2018_async_RR_Cong.py'#'SDN_2018_async.py'#'SDN_2018_demand_loss.py'#'SDN_2018.py'#'Greedy_Min_touch.py'#'SDN_disruption.py'
 
 name_of_program_images='genera_immagini.py'
 
@@ -95,7 +95,7 @@ if flow_fixed==True:
     flow_c=3
 
 if num_couple_fix==False:
-    number_of_couple=32
+    number_of_couple=0
 
 
 #number_of_couple=2
@@ -107,7 +107,7 @@ for i in range(0,num_simulations,1):
         alpha+=0.2
 
     if num_couple_fix==False:
-        number_of_couple+=0
+        number_of_couple+=2
 
     if flow_fixed==False:
         flow_c+=0
@@ -115,7 +115,7 @@ for i in range(0,num_simulations,1):
     if fixed_distruption==False:
         var_distruption+=0
     if fixed_error==False:
-        error+=0.1
+        error+=0.0
 
     for seed_elem in seed_array:
         #esegui una simulazione
