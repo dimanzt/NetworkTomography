@@ -59,7 +59,7 @@ if num_couple_passed!=-1:
 
 else:
     num_couple_fix=False
-    number_of_couple=8
+    number_of_couple=0
 
 fixed_distruption=True
 fixed_error = False
@@ -67,8 +67,8 @@ fixed_error = False
 prob_edge=0.002
 prob_edge_fixed=True
 
-num_simulations=20
-name_of_program_simulation='SDN_2018_sync.py'#'SDN_2018_demand_loss.py'#'SDN_2018.py'#'Greedy_Min_touch.py'#'SDN_disruption.py'
+num_simulations=10
+name_of_program_simulation='SDN_2018_sync_RR_Cong.py'#'SDN_2018_sync.py'#'SDN_2018_demand_loss.py'#'SDN_2018.py'#'Greedy_Min_touch.py'#'SDN_disruption.py'
 
 name_of_program_images='genera_immagini.py'
 
@@ -95,7 +95,7 @@ if flow_fixed==True:
     flow_c=3
 
 if num_couple_fix==False:
-    number_of_couple=8
+    number_of_couple=0
 
 
 #number_of_couple=2
