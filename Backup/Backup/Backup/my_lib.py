@@ -4024,7 +4024,7 @@ def count_occurance(elem, path):
     return count
 
 def write_stat_SDN(path_to_stats,filename_stat,prob_edge,seed_random,alfa,
-                          SumDelta,SumTheta,OBJ,Total_Hop,Max_Time,Min_Hops, #Number of flows which get re-routed ,Number of flows which get delayed ,OPTIMAL Objective
+                          SumDelta,SumTheta,OBJ,Total_Hop,Max_Time,Min_Hops,Satisfied_Demand, #Number of flows which get re-routed ,Number of flows which get delayed ,OPTIMAL Objective
                           num_sim,
                           flow_c_value,                                #Total demand of the graph. number of flows per each demand pair
                           number_of_couple,                            #number of couples (demand pairs)
@@ -4038,14 +4038,14 @@ def write_stat_SDN(path_to_stats,filename_stat,prob_edge,seed_random,alfa,
         if not os.path.exists(path_to_file_stat):
             #print 'non esiste lo creo'
             file=open(path_to_file_stat,'w+')
-            name_of_colunms="Seed\tAlfa\tSumDelta\tSumTheta\tOBJ\tOBJ\tTotal_Hop\tMax_Time\tMin_Hops\tNum_SIM\tNum_SIM\tNum_SIM\tNum_SIM\tNum_SIM\tNum_SIM\tFlow_c_value\tNumberofCouples\tNumberofNodes\tNumberofEdges\n"
+            name_of_colunms="Seed\tAlfa\tSumDelta\tMaxCong\tOBJ\tOBJ\tTotal_Hop\tMax_Time\tMin_Hops\tSatisfied_Demand\tNum_SIM\tNum_SIM\tNum_SIM\tNum_SIM\tNum_SIM\tFlow_c_value\tNumberofCouples\tNumberofNodes\tNumberofEdges\n"
 
             file.write(name_of_colunms)
             file.close
 
 
         file=open(path_to_file_stat,'a')
-        raw_line=str(seed_random)+'\t\t'+str(alfa)+'\t\t'+str(SumDelta)+'\t\t'+str(SumTheta)+'\t\t'+str(OBJ)+'\t\t'+str(OBJ)+'\t\t'+str(Total_Hop)+'\t\t'+str(Max_Time)+'\t\t'+str(Min_Hops)+'\t\t'+str(num_sim)+'\t\t'+str(num_sim)+'\t\t'+str(num_sim)+'\t\t'+str(num_sim)+'\t\t'+str(flow_c_value)+'\t\t'+str(number_of_couple)+'\t\t'+str(Nodes)+'\t\t'+str(Edges)+'\n'
+        raw_line=str(seed_random)+'\t\t'+str(alfa)+'\t\t'+str(SumDelta)+'\t\t'+str(SumTheta)+'\t\t'+str(OBJ)+'\t\t'+str(OBJ)+'\t\t'+str(Total_Hop)+'\t\t'+str(Max_Time)+'\t\t'+str(Min_Hops)+'\t\t'+str(Satisfied_Demand)+'\t\t'+str(num_sim)+'\t\t'+str(num_sim)+'\t\t'+str(num_sim)+'\t\t'+str(flow_c_value)+'\t\t'+str(number_of_couple)+'\t\t'+str(Nodes)+'\t\t'+str(Edges)+'\n'
         file.write(raw_line)
         file.close()
 
