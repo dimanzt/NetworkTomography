@@ -7,7 +7,7 @@ import networkx as nx
 import random
 
 # Model data, get the nodes and capacity from a graph H
-def optimal_SDN_LP(H,green_edges, K, demand_flows, w_l, w_h, Thrh, Thr, weights):
+def optimal_SDN_ILP(H,green_edges, K, demand_flows, w_l, w_h, Thrh, Thr, weights):
     print "Start running the ILP formulation for SDN recovery"
     nodes=[]
     #construct the array nodes:
