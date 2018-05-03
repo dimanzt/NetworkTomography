@@ -7,7 +7,7 @@ import networkx as nx
 import random
 
 # Model data, get the nodes and capacity from a graph H
-def optimal_SDN_LP(H,green_edges, K, demand_flows, w_l, w_h, Thrh, Thr, weights):
+def optimal_SDN_ILP(H,green_edges, K, demand_flows, w_l, w_h, Thrh, Thr, weights):
     print "Start running the ILP formulation for SDN recovery"
     nodes=[]
     #construct the array nodes:
@@ -226,7 +226,7 @@ def optimize_SDN(H,nodes,demand_flows,green_edges,arcs,capacity,K,inflow, demand
     Deltah = {}
     i = 0
     for h in demand_flows:
-        Deltah[h] = m.addVar(ub=1, obj=100*weights[i], vtype=GRB.BINARY, name='Deltah_%s' % (h)) # 2.0
+        Deltah[h] = m.addVar(ub=1, obj=w_h*weights[i], vtype=GRB.BINARY, name='Deltah_%s' % (h)) # 2.0
         #Deltah[h] = m.addVar(ub=1, obj=100, vtype=GRB.BINARY, name='Deltah_%s' % (h)) # 2.0
         i = i + 1
     m.update()
@@ -529,7 +529,7 @@ def optimize_SDN(H,nodes,demand_flows,green_edges,arcs,capacity,K,inflow, demand
             my_delta[h] = 0
             if var_reference.x>0:
                 my_delta[h] =1
-                Tota_ReRouted = Total_ReRouted + 1
+                Total_ReRouted = Total_ReRouted + 1
         print 'Path Length:'
         print Total_Hop
         print 'Straggler Time:'
