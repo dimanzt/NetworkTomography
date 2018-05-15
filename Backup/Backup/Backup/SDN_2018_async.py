@@ -206,11 +206,11 @@ i = 0
 weights = []
 for e in demand_flows:
   if(i/float(len(demand_flows)) <=0.4):
-    weights.append(1)#100
+    weights.append(100)#100
   if((i/float(len(demand_flows)) >=0.4) and (i/float(len(demand_flows)) <=0.5)):
     weights.append(1)
   if((i/float(len(demand_flows)) >=0.5) and (i/float(len(demand_flows)) <=0.9)):
-    weights.append(1) #100
+    weights.append(100) #100
   if((i/float(len(demand_flows)) >=0.9) and (i/float(len(demand_flows)) <=1)):
     weights.append(1)
   i+=1
@@ -315,11 +315,12 @@ green_edges_T=deepcopy(copy_of_green_edges)
 w_l = 0
 w_h = 0
 Max_Time_T=0
+MaxCong_T = 0
 Total_Hop_T = 0
 Thr= len(arcs)*100
 Thrh = Thr
 Total_ReRouted_T = 0
-[OBJ_T, Deltah_T, H4, my_used_arcs_T, Max_Time_T, Total_Hop_T, Total_ReRouted_T]= optimal_SDN_LP(H,green_edges, K, demand_flows, w_l, w_h, Thrh, Thr,weights)
+[OBJ_T, Deltah_T, H4, my_used_arcs_T, Max_Time_T, Total_Hop_T, Total_ReRouted_T, MaxCong_T]= optimal_SDN_ILP(H,green_edges, K, demand_flows, w_l, w_h, Thrh, Thr,weights)
 
 #[OBJ_T, Deltah_T, Thetah_T, H2, my_used_arcs_T] = optimal_SDN_Max(H_T,green_edges_T, K, demand_flows, w_l, w_h)
 Min_Hops = 0
@@ -422,19 +423,20 @@ OBJ = 0
 Deltah = []
 Thetah = []
 my_used_arcs = []
-w_l = 100#0.001 #100
-w_h = 200#0.002 #200
+w_l =0 #100#0.001 #100
+w_h =0 #100#0.002 #200
 Thr= Min_Hops*error #len(arcs)*disruption_value #var_distruption #len(arcs)/2
-Thrh= 1.5*float(Thr)/float(len(demand_flows))#Thrh*len(demand_flows)*0.8
+Thrh= 1.3*float(Thr)/float(len(demand_flows))#Thrh*len(demand_flows)*0.8
 #Thr = Thrh*len(demand_flows)
 print 'Thr and Thrh: HEEEEEEEEEEEEEEEEEEEEEREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE'
 print Thrh, Thr, error
-MaxCong = 1
+MaxCong = 0
 Max_Time = 0
 Total_Hop = 0
 Total_ReRouted = 0
+Satisfied_Demand = 0
 #[OBJ, Deltah, H3, my_used_arcs, MaxCong] 
-[OBJ, Deltah, H3, my_used_arcs, Max_Time, Total_Hop, Total_ReRouted]= optimal_SDN_LP(H,green_edges, K, demand_flows, w_l, w_h, Thrh, Thr, weights)
+[OBJ, Deltah, H3, my_used_arcs, Max_Time, Total_Hop, Total_ReRouted, MaxCong]= optimal_SDN_ILP(H,green_edges, K, demand_flows, w_l, w_h, Thrh, Thr, weights)
 ##[OBJ, Deltah, Thetah, H3, my_used_arcs] = optimal_SDN(H,green_edges, K, demand_flows, w_l, w_h)
 print 'OBJECTIVE:'
 print OBJ
@@ -462,7 +464,7 @@ write_stat_time_simulation(path_to_stat_times,'OPT',filename_graph,int(sys.argv[
 #sys.exit(0)
 #Gap=time_elapsed_optimal/(len(nodes_recovered_optimal)*100)
 #---------------------------------------------------------Expected -OPTIMAL-------------------------------------------------------
-filename_stat='stat_simulations_Asynch_'+filename_graph+"_Prob_"+str(prob_edge)+"_Alpha_"+str(alfa)+"_KHOP_"+str(K_HOPS)+"_distance_metric_"+str(distance_metric_passed)+"_type_of_bet_"+str(type_of_bet_passed)+"_always_put_monitor_"+str(always_split)+"_randomDisruption_"+str(random_disruption)+"_disruption_value_"+str(disruption_value)+"_error_"+str(error)+".txt"
+filename_stat='stat_Asynch_Min_Edge_Same_Prio_'+filename_graph+"_Prob_"+str(prob_edge)+"_Alpha_"+str(alfa)+"_KHOP_"+str(K_HOPS)+"_distance_metric_"+str(distance_metric_passed)+"_type_of_bet_"+str(type_of_bet_passed)+"_always_put_monitor_"+str(always_split)+"_randomDisruption_"+str(random_disruption)+"_disruption_value_"+str(disruption_value)+"_error_"+str(error)+".txt"
 
 #numero della simulazione corrente e scrivo statistiche
 num_sim=get_num_simulation(path_to_file_simulation)
@@ -470,7 +472,7 @@ num_sim=get_num_simulation(path_to_file_simulation)
 Nodes= len(H.nodes())
 Edges = len(H.edges())
 write_stat_SDN(path_to_stats,filename_stat,prob_edge,seed_random,alfa,
-                          SumDelta,MaxCong,Objective,Total_Hop,Max_Time,Min_Hops, #Number of flows which get re-routed ,Number of flows which get delayed ,OPTIMAL Objective
+                          SumDelta,MaxCong,Objective,Total_Hop,Max_Time,Min_Hops,Satisfied_Demand, #Number of flows which get re-routed ,Number of flows which get delayed ,OPTIMAL Objective
                           num_sim,
                           flow_c_value,                                #Total demand of the graph, amount of flow for each demand pair
                           number_of_couple,                            #number of couples
