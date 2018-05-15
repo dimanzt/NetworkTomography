@@ -157,12 +157,12 @@ def optimal_SDN_ILP(H,green_edges, K, demand_flows, w_l, w_h, Thrh, Thr, weights
     #my_altered_switches=[]
     my_used_arc=[]
     my_delta=[]
-    MaxCong = 1
+    MaxCong = 0
     #my_theta=[]
 
     #Deltah, Thetah, Used_Edges
     #Time,my_used_arc, my_delta, MaxCong =optimize_SDN(H,nodes,demand_flows,green_edges,arcs,capacity,K,inflow, demand_value, w_l, w_h, Thrh, Thr)
-    Max_Time,my_used_arc, my_delta, Total_Hop, Total_ReRouted = optimize_SDN(H,nodes,demand_flows,green_edges,arcs,capacity,K,inflow, demand_value, w_l, w_h, Thrh, Thr, weights)
+    Max_Time,my_used_arc, my_delta, Total_Hop, Total_ReRouted, MaxCong = optimize_SDN(H,nodes,demand_flows,green_edges,arcs,capacity,K,inflow, demand_value, w_l, w_h, Thrh, Thr, weights)
     print 'Rerouted flows'
     print my_delta #Deltah
     print 'Delayed flows'
@@ -201,7 +201,7 @@ def optimal_SDN_ILP(H,green_edges, K, demand_flows, w_l, w_h, Thrh, Thr, weights
       #print my_theta[i]
       Objective = w_l*float(my_theta[i]) + Objective
     """
-    return Objective, my_delta, H, my_used_arc, Max_Time, Total_Hop, Total_ReRouted#MaxCong #Deltah, Thetah, H
+    return Objective, my_delta, H, my_used_arc, Max_Time, Total_Hop, Total_ReRouted, MaxCong #Deltah, Thetah, H
 
 
 
@@ -226,8 +226,8 @@ def optimize_SDN(H,nodes,demand_flows,green_edges,arcs,capacity,K,inflow, demand
     Deltah = {}
     i = 0
     for h in demand_flows:
-        Deltah[h] = m.addVar(ub=1, obj=w_h*weights[i], vtype=GRB.BINARY, name='Deltah_%s' % (h)) # 2.0
-        #Deltah[h] = m.addVar(ub=1, obj=100, vtype=GRB.BINARY, name='Deltah_%s' % (h)) # 2.0
+        #Deltah[h] = m.addVar(ub=1, obj=w_h*weights[i], vtype=GRB.BINARY, name='Deltah_%s' % (h)) # 2.0
+        Deltah[h] = m.addVar(ub=1, obj=w_h, vtype=GRB.BINARY, name='Deltah_%s' % (h)) # 2.0
         i = i + 1
     m.update()
     #Add Thetah for existing flows which are not being re-routed but cross through an updated switch we give lower cost (1) to them
@@ -387,21 +387,6 @@ def optimize_SDN(H,nodes,demand_flows,green_edges,arcs,capacity,K,inflow, demand
         my_delta={}#[]
         my_theta={}#[]
         #Start finding the solution after the optimization for used arc in h:
-        for h in demand_flows:
-            for i,j in arcs:
-                var_reference = m.getVarByName('x_%s_%s_%s' %(h, i, j)) #used arc for flow h
-                var_reference_reverse = m.getVarByName('x_r_%s_%s_%s' %(h, j, i))
-                my_used_arc[h,i,j] =0
-                my_used_arc[h,j,i] =0
-                RR_used_arc[h,i,j] =0
-                RR_used_arc[h,j,i] =0
-                if var_reference.x>0:# or var_reference_reverse.x>0:
-                    This= (i,j,h)
-                    my_used_arc[h,i,j] = 1
-                    Total_Hop= Total_Hop + 1
-                if var_reference_reverse.x>0:
-                    my_used_arc[h,j,i] = 1
-                    Total_Hop= Total_Hop + 1
         ##############################################################
         #Define used capacity
         Usedcapacity={}
@@ -417,7 +402,33 @@ def optimize_SDN(H,nodes,demand_flows,green_edges,arcs,capacity,K,inflow, demand
                         Usedcapacity.update({arc:cap})
                     else:
                         print 'ERROR'
-                        print arc    
+                        print arc
+        ##############################################################
+        for h in demand_flows:
+            for i,j in arcs:
+                var_reference = m.getVarByName('x_%s_%s_%s' %(h, i, j)) #used arc for flow h
+                var_reference_reverse = m.getVarByName('x_r_%s_%s_%s' %(h, j, i))
+                my_used_arc[h,i,j] =0
+                my_used_arc[h,j,i] =0
+                RR_used_arc[h,i,j] =0
+                RR_used_arc[h,j,i] =0
+                if var_reference.x>0:# or var_reference_reverse.x>0:
+                    This= (i,j,h)
+                    my_used_arc[h,i,j] = 1
+                    Total_Hop= Total_Hop + 1
+                    cap = Usedcapacity[i, j] +demand_value[h]
+                    print 'CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP:'
+                    print cap, Usedcapacity[i, j]
+                    Usedcapacity.update({(i,j):cap})
+                    print Usedcapacity[i, j] 
+                if var_reference_reverse.x>0:
+                    my_used_arc[h,j,i] = 1
+                    Total_Hop= Total_Hop + 1
+                    cap = Usedcapacity[i, j] +demand_value[h] 
+                    print 'TTTTTTTTTCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP'
+                    print cap,Usedcapacity[i, j] 
+                    Usedcapacity.update({(i,j):cap})
+        ##############################################################
         ##############################################################
         """
         #Use Random Rounding to select one path for each demand flow:
@@ -484,14 +495,15 @@ def optimize_SDN(H,nodes,demand_flows,green_edges,arcs,capacity,K,inflow, demand
             cnt = cnt+1
         ######################################################################
         #Compute the maximum amount of congestion: That is for all i,j \in E Usedcapacity < MaxCong
-        MaxCong = 1
+        """
+        MaxCong = 0
         for edge in H.edges():
           id_source=edge[0]
           id_target=edge[1]
           if float(Usedcapacity[id_source, id_target])/float(capacity[id_source,id_target]) > MaxCong:
             MaxCong = float(Usedcapacity[id_source, id_target])/float(capacity[id_source,id_target])
         #Start finding the solution for the altered switches:
-        """
+        
         """
         for i in nodes:
             var_reference = m.getVarByName('T_%s' %(i))
@@ -567,7 +579,7 @@ def optimize_SDN(H,nodes,demand_flows,green_edges,arcs,capacity,K,inflow, demand
         print('The optimal objective is %g' % m.objVal)
         print 'My Altered Switches:'
         #print my_altered_switch
-        MaxCong = 1
+        #MaxCong = 1
         print 'MaxCongestion'
         print MaxCong
-        return Max_Time,my_used_arc, my_delta, Total_Hop, Total_ReRouted #my_used_arc -> RR_used_arc
+        return Max_Time,my_used_arc, my_delta, Total_Hop, Total_ReRouted, MaxCong #my_used_arc -> RR_used_arc
