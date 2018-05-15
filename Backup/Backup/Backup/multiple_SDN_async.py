@@ -33,7 +33,7 @@ else:
 if len(sys.argv)>7:
    disruption_value=int(sys.argv[8])
 else:
-   disruption_value=50
+   disruption_value=40
 if len(sys.argv)>8:
    var_distruption=float(sys.argv[9])
 else:
@@ -68,7 +68,7 @@ prob_edge=0.002
 prob_edge_fixed=True
 
 num_simulations=20
-name_of_program_simulation='SDN_2018_async_RR_Cong.py'#'SDN_2018_async.py'#'SDN_2018_demand_loss.py'#'SDN_2018.py'#'Greedy_Min_touch.py'#'SDN_disruption.py'
+name_of_program_simulation='SDN_2018_async.py'#'SDN_2018_async_RR_Demand.py'#'SDN_2018_async_RR_Demand.py'#'SDN_2018_async_RR_Cong.py'#'SDN_2018_async.py'#'SDN_2018_demand_loss.py'#'SDN_2018.py'#'Greedy_Min_touch.py'#'SDN_disruption.py'
 
 name_of_program_images='genera_immagini.py'
 
@@ -115,7 +115,7 @@ for i in range(0,num_simulations,1):
     if fixed_distruption==False:
         var_distruption+=0
     if fixed_error==False:
-        error+=0.0
+        error+=0
 
     for seed_elem in seed_array:
         #esegui una simulazione
