@@ -68,7 +68,7 @@ prob_edge=0.002
 prob_edge_fixed=True
 
 num_simulations=20
-name_of_program_simulation='SDN_2018_sync.py'#'SDN_2018_sync_RR_Demand.py'#'SDN_2018_sync_RR_Cong.py'#'SDN_2018_sync.py'#'SDN_2018_demand_loss.py'#'SDN_2018.py'#'Greedy_Min_touch.py'#'SDN_disruption.py'
+name_of_program_simulation='SDN_2018_sync_RR_Cong.py'#'SDN_2018_sync_RR_Demand.py'#'SDN_2018_sync_RR_Cong.py'#'SDN_2018_sync.py'#'SDN_2018_demand_loss.py'#'SDN_2018.py'#'Greedy_Min_touch.py'#'SDN_disruption.py'
 
 name_of_program_images='genera_immagini.py'
 
