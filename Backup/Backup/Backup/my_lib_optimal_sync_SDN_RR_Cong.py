@@ -228,7 +228,7 @@ def optimize_SDN(H,nodes,demand_flows,green_edges,arcs,capacity,K,inflow, demand
     i = 0
     for h in demand_flows:
         BigDeltah[h] = m.addVar(ub=len(demand_flows), obj=w_h*weights[i], vtype=GRB.CONTINUOUS, name='BigDeltah_%s' % (h)) # 2.0
-        Deltah[h] = m.addVar(ub=1, obj=0, vtype=GRB.BINARY, name='Deltah_%s' % (h)) # 2.0
+        Deltah[h] = m.addVar(ub=1, obj=0, vtype=GRB.CONTINUOUS, name='Deltah_%s' % (h)) # 2.0
         i = i + 1
     m.update()
     #Add Thetah for existing flows which are not being re-routed but cross through an updated switch we give lower cost (1) to them
@@ -240,7 +240,7 @@ def optimize_SDN(H,nodes,demand_flows,green_edges,arcs,capacity,K,inflow, demand
     t = {}
     for i in nodes:
       for h in demand_flows:
-        t[i,h] = m.addVar(ub=1, obj=0.0, vtype=GRB.BINARY, name='T_%s_%s' % (i,h))
+        t[i,h] = m.addVar(ub=1, obj=0.0, vtype=GRB.CONTINUOUS, name='T_%s_%s' % (i,h))
     m.update()
     T = {}
     T[1]= m.addVar(ub=len(demand_flows), obj=0.0, vtype=GRB.CONTINUOUS, name='StragglerT')
@@ -392,6 +392,7 @@ def optimize_SDN(H,nodes,demand_flows,green_edges,arcs,capacity,K,inflow, demand
         my_altered_switch={}#[]
         my_delta={}#[]
         my_theta={}#[]
+        My_arcs=[]
         #Start finding the solution after the optimization for used arc in h:
         for h in demand_flows:
             for i,j in arcs:
@@ -404,11 +405,15 @@ def optimize_SDN(H,nodes,demand_flows,green_edges,arcs,capacity,K,inflow, demand
                 if var_reference.x>0:# or var_reference_reverse.x>0:
                     This= (i,j,h)
                     my_used_arc[h,i,j] = var_reference.x
+                    edge=(i,j)
+                    My_arcs.append(edge)
                     print 'var_reference.x,h, i, j'
                     print var_reference.x, h, i, j
                     Total_Hop= Total_Hop + 1
                 if var_reference_reverse.x>0:
                     my_used_arc[h,j,i] = var_reference.x
+                    edge=(j,i)
+                    My_arcs.append(edge)
                     Total_Hop= Total_Hop + 1
         ##############################################################
         #Define used capacity
@@ -438,7 +443,7 @@ def optimize_SDN(H,nodes,demand_flows,green_edges,arcs,capacity,K,inflow, demand
           source = edge[0]
           target = edge[1]
           H_temp=nx.Graph()
-          for i,j in arcs:
+          for i,j in My_arcs:
             if i not in H_temp.nodes():
               H_temp.add_node(i)
             if j not in H_temp.nodes():
@@ -545,12 +550,33 @@ def optimize_SDN(H,nodes,demand_flows,green_edges,arcs,capacity,K,inflow, demand
             Time = var_reference.x
         #Start finding the solution for Delta_h
         Total_ReRouted= 0
+        #for h in demand_flows:
+        #    var_reference = m.getVarByName('Deltah_%s' %(h))
+        #    my_delta[h] = 0
+        #    if var_reference.x>0:
+        #        my_delta[h] =1
+        #        Tota_ReRouted = Total_ReRouted + 1
         for h in demand_flows:
-            var_reference = m.getVarByName('Deltah_%s' %(h))
-            my_delta[h] = 0
-            if var_reference.x>0:
-                my_delta[h] =1
-                Tota_ReRouted = Total_ReRouted + 1
+          my_delta[h] = 0
+          for i,j in arcs:
+              if(K[h,i,j] == 0 and RR_used_arc[h,i,j]==1):
+                my_delta[h] = 1
+                Total_ReRouted = Total_ReRouted + 1
+              if(K[h,i,j] == 1 and RR_used_arc[h,i,j]==0):
+                my_delta[h] = 1
+                Total_ReRouted = Total_ReRouted + 1
+        Max_Time_RR=0
+        Max_Time_temp =0
+        for i in nodes:
+          for h in demand_flows:
+            for j in H.neighbors(i):
+              if(K[h,i,j] == 0 and RR_used_arc[h,i,j]==1):
+                Max_Time_temp = Max_Time_temp+ 1
+              if(K[h,i,j] == 1 and RR_used_arc[h,i,j]==0):
+                Max_Time_temp = Max_Time_temp+ 1
+          if(Max_Time_temp > Max_Time_RR):
+              Max_Time_RR= Max_Time_temp
+          Max_Time_temp= 0
         print 'Path Length:'
         print Total_Hop
         print 'Straggler Time:'
@@ -590,4 +616,4 @@ def optimize_SDN(H,nodes,demand_flows,green_edges,arcs,capacity,K,inflow, demand
         #print my_altered_switch
         print 'MaxCongestion'
         print MaxCong
-        return Max_Time,RR_used_arc, my_delta, RR_Total_Hop, Total_ReRouted, MaxCong #my_used_arc -> RR_used_arc
+        return Max_Time_RR, RR_used_arc, my_delta, RR_Total_Hop, Total_ReRouted, MaxCong #my_used_arc -> RR_used_arc
