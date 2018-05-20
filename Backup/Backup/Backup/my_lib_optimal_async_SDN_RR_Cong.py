@@ -217,16 +217,16 @@ def optimize_SDN(H,nodes,demand_flows,green_edges,arcs,capacity,K,inflow, demand
     #X_ij is a variable that shows which edges will be used after the optimization
     for h in demand_flows:
         for i,j in arcs:
-            x[h,i,j] = m.addVar(ub=1, obj=1, vtype=GRB.CONTINUOUS,
+            x[h,i,j] = m.addVar(lb=0,ub=1, obj=1, vtype=GRB.CONTINUOUS,
                                    name='x_%s_%s_%s' % (h, i, j))
-            x[h,j,i] = m.addVar(ub=1, obj=1, vtype=GRB.CONTINUOUS,
+            x[h,j,i] = m.addVar(lb=0,ub=1, obj=1, vtype=GRB.CONTINUOUS,
                                    name='x_r_%s_%s_%s' % (h, j, i))
     m.update()
     #Add Deltah for re-routing cost which has a higher cost, we give 2 
     Deltah = {}
     i = 0
     for h in demand_flows:
-        Deltah[h] = m.addVar(ub=1, obj=w_h*weights[i], vtype=GRB.BINARY, name='Deltah_%s' % (h)) # 2.0
+        Deltah[h] = m.addVar(lb=0,ub=1, obj=w_h*weights[i], vtype=GRB.CONTINUOUS, name='Deltah_%s' % (h)) # 2.0
         #Deltah[h] = m.addVar(ub=1, obj=100, vtype=GRB.BINARY, name='Deltah_%s' % (h)) # 2.0
         i = i + 1
     m.update()
@@ -239,7 +239,7 @@ def optimize_SDN(H,nodes,demand_flows,green_edges,arcs,capacity,K,inflow, demand
     t = {}
     for i in nodes:
       for h in demand_flows:
-        t[i,h] = m.addVar(ub=1, obj=0.0, vtype=GRB.BINARY, name='T_%s_%s' % (i,h))
+        t[i,h] = m.addVar(lb=0,ub=1, obj=0.0, vtype=GRB.CONTINUOUS, name='T_%s_%s' % (i,h))
     m.update()
     T = {}
     T[1]= m.addVar(ub=len(demand_flows), obj=0.0, vtype=GRB.CONTINUOUS, name='StragglerT')
@@ -386,6 +386,7 @@ def optimize_SDN(H,nodes,demand_flows,green_edges,arcs,capacity,K,inflow, demand
         my_altered_switch={}#[]
         my_delta={}#[]
         my_theta={}#[]
+        My_arcs = []
         #Start finding the solution after the optimization for used arc in h:
         for h in demand_flows:
             for i,j in arcs:
@@ -398,9 +399,13 @@ def optimize_SDN(H,nodes,demand_flows,green_edges,arcs,capacity,K,inflow, demand
                 if var_reference.x>0:# or var_reference_reverse.x>0:
                     This= (i,j,h)
                     my_used_arc[h,i,j] = 1
+                    edge=(i,j)
+                    My_arcs.append(edge)
                     Total_Hop= Total_Hop + 1
                 if var_reference_reverse.x>0:
                     my_used_arc[h,j,i] = 1
+                    edge=(j,i)
+                    My_arcs.append(edge)
                     Total_Hop= Total_Hop + 1
         ##############################################################
         #Define used capacity
@@ -430,7 +435,7 @@ def optimize_SDN(H,nodes,demand_flows,green_edges,arcs,capacity,K,inflow, demand
           source = edge[0]
           target = edge[1]
           H_temp=nx.Graph()
-          for i,j in arcs:
+          for i,j in My_arcs:
             if i not in H_temp.nodes():
               H_temp.add_node(i)
             if j not in H_temp.nodes():
@@ -537,12 +542,23 @@ def optimize_SDN(H,nodes,demand_flows,green_edges,arcs,capacity,K,inflow, demand
             Time = var_reference.x
         #Start finding the solution for Delta_h
         Total_ReRouted= 0
+        #for h in demand_flows:
+        #    var_reference = m.getVarByName('Deltah_%s' %(h))
+        #    my_delta[h] = 0
+        #    if var_reference.x>0:
+        #        my_delta[h] =1
+        #        Tota_ReRouted = Total_ReRouted + 1
+        #######COMPUTE my_delta:
         for h in demand_flows:
-            var_reference = m.getVarByName('Deltah_%s' %(h))
-            my_delta[h] = 0
-            if var_reference.x>0:
-                my_delta[h] =1
-                Tota_ReRouted = Total_ReRouted + 1
+          my_delta[h] = 0
+          for i,j in arcs:
+              if(K[h,i,j] == 0 and RR_used_arc[h,i,j]==1):
+                my_delta[h] = 1
+                Total_ReRouted = Total_ReRouted + 1
+              if(K[h,i,j] == 1 and RR_used_arc[h,i,j]==0):
+                my_delta[h] = 1
+                Total_ReRouted = Total_ReRouted + 1
+
         print 'Path Length:'
         print Total_Hop
         print 'Straggler Time:'
