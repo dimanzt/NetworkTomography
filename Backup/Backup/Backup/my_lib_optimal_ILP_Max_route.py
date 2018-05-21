@@ -211,7 +211,7 @@ def optimize_SDN_Max(H,nodes,demand_flows,arcs,capacity,K,inflow, demand_value, 
     #X_ij is a variable that shows which edges will be used after the optimization
     for h in demand_flows:
         for i,j in arcs:
-            r = random.randint(0,300)#capacity[i,j] #random.randint(0,300)
+            r = 1#random.randint(0,300)#capacity[i,j] #random.randint(0,300)
             x[h,i,j] = m.addVar(ub=1, obj=r, vtype=GRB.BINARY,
                                    name='x_%s_%s_%s' % (h, i, j))
             x[h,j,i] = m.addVar(ub=1, obj=r, vtype=GRB.BINARY,
